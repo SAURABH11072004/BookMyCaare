@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookMyCare Admin Login</title>
+    <link rel="stylesheet" href="/css/admin-login.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="/admin" class="back-arrow">←</a>
+            <div class="logo">BookMyCare</div>
+        </div>
+        <div class="login-box">
+            <div class="title">Admin Login</div>
+            
+            <div id="error-message" class="error-message"></div>
+            <div id="success-message" class="success-message"></div>
+            
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" placeholder="Enter your admin email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="password" placeholder="Enter your password" required>
+                        <span class="eye-icon" onclick="togglePasswordVisibility()">👁️</span>
+                    </div>
+                </div>
+                <button type="submit" class="login-btn" id="login-btn">
+                    <span id="btn-text">Log In</span>
+                    <div id="loader" class="loader"></div>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('password');
+            const eyeIcon = document.querySelector('.eye-icon');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                eyeIcon.textContent = '👁️';
+            } else {
+                passwordInput.type = 'password';
+                eyeIcon.textContent = '👁️';
+            }
+        }
+
+        async function handleLogin(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const errorElement = document.getElementById('error-message');
+            const successElement = document.getElementById('success-message');
+            const loginBtn = document.getElementById('login-btn');
+            const btnText = document.getElementById('btn-text');
+            const loader = document.getElementById('loader');
+            
+            // Clear previous messages
+            errorElement.style.display = 'none';
+            successElement.style.display = 'none';
+            
+            // Show loading state
+            btnText.style.display = 'none';
+            loader.style.display = 'block';
+            loginBtn.disabled = true;
+            
+            try {
+                const response = await fetch('/admin/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password }),
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Show success message
+                    successElement.textContent = 'Login successful! Redirecting...';
+                    successElement.style.display = 'block';
+                    
+                    // Store admin data in session/local storage if needed
+                    if (data.admin) {
+                        localStorage.setItem('admin', JSON.stringify(data.admin));
+                    }
+                    
+                    // Redirect to admin dashboard after a short delay
+                    setTimeout(() => {
+                        window.location.href = '/admin/dashboard';
+                    }, 1500);
+                } else {
+                    // Show error message
+                    errorElement.textContent = data.message || 'Invalid email or password';
+                    errorElement.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                errorElement.textContent = 'An error occurred. Please try again.';
+                errorElement.style.display = 'block';
+            } finally {
+                // Reset button state
+                btnText.style.display = 'block';
+                loader.style.display = 'none';
+                loginBtn.disabled = false;
+            }
+        }
+
+        // Attach form submit handler
+        document.getElementById('login-form').addEventListener('submit', handleLogin);
+
+        // Check for success messages in URL parameters (for redirects from signup)
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const successMessage = urlParams.get('success');
+            
+            if (successMessage) {
+                const successElement = document.getElementById('success-message');
+                successElement.textContent = decodeURIComponent(successMessage);
+                successElement.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>

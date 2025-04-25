@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Appointment - BookMyCare</title>
+    <link rel="stylesheet" href="/css/style2.css">
+    <style>
+        .message {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .success-message {
+            background-color: #d4edda;
+            color: #155724;
+            display: none;
+        }
+        .error-message {
+            background-color: #f8d7da;
+            color: #721c24;
+            display: none;
+        }
+        .form-group input, .form-group select {
+            width: 45%;
+            margin-right: 5%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .btn.appointment-btn {
+            width: 100%;
+            padding: 10px;
+            background-color: #1a3c34;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .btn.appointment-btn:hover {
+            background-color: #13322a;
+        }
+    </style>
+</head>
+<body class="create-appointment-page">
+    <header>
+        <a href="/home3.html"><span>←</span> BookMyCare</a>
+    </header>
+
+    <main>
+        <div class="form-container">
+            <h2>Patient Details</h2>
+            <form id="appointmentForm" method="POST">
+                <div class="form-group">
+                    <input type="text" name="first_name" placeholder="Enter your first name" required>
+                    <input type="text" name="last_name" placeholder="Enter your last name" required>
+                </div>
+                <div class="form-group">
+                    <select name="gender" required>
+                        <option value="">Select Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <input type="tel" name="phone_number" placeholder="Enter your phone number" pattern="[0-9]{10}" title="Please enter a valid 10-digit phone number" required>
+                </div>
+                <div class="form-group">
+                    <input type="number" name="age" placeholder="Enter your Age" min="0" required>
+                    <input type="text" name="location" placeholder="Enter your Location" required>
+                </div>
+                <div class="form-group">
+                    <input type="date" name="appointment_date" required>
+                    <input type="time" name="appointment_time" required>
+                </div>
+                <div class="form-group">
+                    <select name="doctor_name" required>
+                        <option value="">Select Doctor</option>
+                        <% doctors.forEach(doctor => { %>
+                            <option value="<%= doctor.doctor_name %>"><%= doctor.doctor_name %></option>
+                        <% }) %>
+                    </select>
+                </div>
+                <button type="submit" class="btn appointment-btn">Book Appointment</button>
+            </form>
+
+            <!-- Success/Error message containers -->
+            <p id="successMessage" class="message success-message" style="display: none;">Appointment booked successfully!</p>
+            <p id="errorMessage" class="message error-message" style="display: none;"></p>
+        </div>
+
+        <div class="image-container">
+            <img src="/images/hospital.jpg" alt="Hospital Image">
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-left">
+                <h3>BookMyCare</h3>
+                <p>Copyright © 2025 TRKC Templates. All Rights Reserved.</p>
+            </div>
+            <div class="footer-links">
+                <div>
+                    <h4>Products</h4>
+                    <ul>
+                        <li>Features</li>
+                        <li>Pricing</li>
+                        <li>Case studies</li>
+                        <li>Updates</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>Company</h4>
+                    <ul>
+                        <li>About</li>
+                        <li>Contact Us</li>
+                        <li>Careers</li>
+                        <li>Blog</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>Support</h4>
+                    <ul>
+                        <li>Getting started</li>
+                        <li>Help center</li>
+                        <li>Server status</li>
+                        <li>Report a bug</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>Follow us</h4>
+                    <ul>
+                        <li>Facebook</li>
+                        <li>Twitter</li>
+                        <li>Instagram</li>
+                        <li>LinkedIn</li>
+                        <li>YouTube</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('appointmentForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData);
+
+            // Basic client-side validation
+            if (!data.first_name || !data.last_name || !data.gender || !data.phone_number || !data.age || !data.location || !data.appointment_date || !data.appointment_time || !data.doctor_name) {
+                document.getElementById('errorMessage').textContent = 'All fields are required.';
+                document.getElementById('errorMessage').style.display = 'block';
+                document.getElementById('successMessage').style.display = 'none';
+                return;
+            }
+            if (!/^[0-9]{10}$/.test(data.phone_number)) {
+                document.getElementById('errorMessage').textContent = 'Please enter a valid 10-digit phone number.';
+                document.getElementById('errorMessage').style.display = 'block';
+                document.getElementById('successMessage').style.display = 'none';
+                return;
+            }
+
+            fetch('/submit-appointment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            })
+            .then(response => response.json())
+            .then(data => {
+                const successMessage = document.getElementById('successMessage');
+                const errorMessage = document.getElementById('errorMessage');
+                if (data.success) {
+                    successMessage.style.display = 'block';
+                    errorMessage.style.display = 'none';
+                    // Reset form and redirect after a delay
+                    this.reset();
+                    setTimeout(() => {
+                        window.location.href = '/appointments';
+                    }, 2000);
+                } else {
+                    errorMessage.textContent = data.message || 'Failed to book appointment. Please try again.';
+                    errorMessage.style.display = 'block';
+                    successMessage.style.display = 'none';
+                }
+            })
+            .catch(error => {
+                console.error('Error booking appointment:', error);
+                const errorMessage = document.getElementById('errorMessage');
+                errorMessage.textContent = 'Error booking appointment. Please check the console for details.';
+                errorMessage.style.display = 'block';
+            });
+        });
+    </script>
+</body>
+</html>

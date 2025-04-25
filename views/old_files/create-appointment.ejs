@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Appointment - BookMyCare</title>
+    <link rel="stylesheet" href="/css/style2.css">
+</head>
+<body class="create-appointment-page">
+    <header>
+        <a href="/home3.html"><span>←</span> BookMyCare</a>
+    </header>
+
+    <main>
+        <div class="form-container">
+            <h2>Patient Details</h2>
+            <form id="appointmentForm" method="POST">
+                <div class="form-group">
+                    <input type="text" name="first_name" placeholder="Enter your first name" required>
+                    <input type="text" name="last_name" placeholder="Enter your last name" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" name="gender" placeholder="Enter your Gender" required>
+                    <input type="tel" name="phone_number" placeholder="Enter your phone number" pattern="[0-9]{10}" title="Please enter a valid 10-digit phone number" required>
+                </div>
+                <div class="form-group">
+                    <input type="number" name="age" placeholder="Enter your Age" min="0" required>
+                    <input type="text" name="location" placeholder="Enter your Location" required>
+                </div>
+                <div class="form-group">
+                    <input type="date" name="appointment_date" required>
+                    <input type="time" name="appointment_time" required>
+                </div>
+                <div class="form-group">
+                    <select name="doctor_name" required>
+                        <option value="">Select Doctor</option>
+                        <% doctors.forEach(doctor => { %>
+                            <option value="<%= doctor.doctor_name %>"><%= doctor.doctor_name %></option>
+                        <% }) %>
+                    </select>
+                </div>
+                <button type="submit" class="btn appointment-btn">Book Appointment</button>
+            </form>
+
+            <!-- Success/Error message containers -->
+            <p id="successMessage" class="message success-message" style="display: none;">Appointment booked successfully!</p>
+            <p id="errorMessage" class="message error-message" style="display: none;">Failed to book appointment. Please try again.</p>
+        </div>
+
+        <div class="image-container">
+            <img src="/images/hospital.jpg" alt="Hospital Image">
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-left">
+                <h3>BookMyCare</h3>
+                <p>Copyright © 2025 TRKC Templates. All Rights Reserved.</p>
+            </div>
+            <div class="footer-links">
+                <div>
+                    <h4>Products</h4>
+                    <ul>
+                        <li>Features</li>
+                        <li>Pricing</li>
+                        <li>Case studies</li>
+                        <li>Updates</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>Company</h4>
+                    <ul>
+                        <li>About</li>
+                        <li>Contact Us</li>
+                        <li>Careers</li>
+                        <li>Blog</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>Support</h4>
+                    <ul>
+                        <li>Getting started</li>
+                        <li>Help center</li>
+                        <li>Server status</li>
+                        <li>Report a bug</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>Follow us</h4>
+                    <ul>
+                        <li>Facebook</li>
+                        <li>Twitter</li>
+                        <li>Instagram</li>
+                        <li>LinkedIn</li>
+                        <li>YouTube</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('appointmentForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData);
+
+            fetch('/submit-appointment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            })
+            .then(response => response.json())
+            .then(data => {
+                const successMessage = document.getElementById('successMessage');
+                const errorMessage = document.getElementById('errorMessage');
+                if (data.success) {
+                    successMessage.style.display = 'block';
+                    errorMessage.style.display = 'none';
+                    // Redirect to appointments page after a delay
+                    setTimeout(() => {
+                        window.location.href = '/appointments';
+                    }, 2000);
+                } else {
+                    errorMessage.textContent = data.message || 'Failed to book appointment. Please try again.';
+                    errorMessage.style.display = 'block';
+                    successMessage.style.display = 'none';
+                }
+            })
+            .catch(error => {
+                console.error('Error booking appointment:', error);
+                const errorMessage = document.getElementById('errorMessage');
+                errorMessage.textContent = 'Error booking appointment. Please try again.';
+                errorMessage.style.display = 'block';
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookMyCare Admin Sign-Up</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin: 20px;
+        }
+
+        .header {
+            background-color: #fff;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header img {
+            width: 60px;
+            height: 60px;
+        }
+
+        .header button {
+            background-color: #00a087;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .header button:hover {
+            background-color: #008f77;
+        }
+
+        .signup-section {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .signup-section h2 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .signup-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .form-group {
+            position: relative;
+        }
+
+        .signup-form input {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 100%;
+            transition: border-color 0.3s;
+        }
+
+        .signup-form input:focus {
+            outline: none;
+            border-color: #00a087;
+        }
+
+        .signup-form button {
+            background-color: #00a087;
+            color: #fff;
+            border: none;
+            padding: 15px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+
+        .signup-form button:hover {
+            background-color: #008f77;
+        }
+
+        .error-message {
+            color: #d32f2f;
+            font-size: 12px;
+            margin-top: 5px;
+            text-align: left;
+            display: none;
+        }
+
+        .success-message {
+            color: #388e3c;
+            font-size: 14px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 10px;
+            top: 35px;
+            cursor: pointer;
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="images/logo.png" alt="BookMyCare Logo">
+            <button onclick="window.location.href='/admin-login'">LOG IN</button>
+        </div>
+
+        <div class="signup-section">
+            <h2 style="margin-top: -10px;">SIGN-UP<br>ADMIN DETAILS</h2>
+            <form id="signup-form" class="signup-form">
+                <div class="form-group">
+                    <input type="text" name="hospital_name" placeholder="HOSPITAL NAME" required>
+                    <div class="error-message" id="hospital_name_error"></div>
+                </div>
+                
+                <div class="form-group">
+                    <input type="text" name="doctor_name" placeholder="DOCTOR NAME" required>
+                    <div class="error-message" id="doctor_name_error"></div>
+                </div>
+                
+                <div class="form-group">
+                    <input type="text" name="doctor_degree" placeholder="DOCTOR DEGREE" required>
+                    <div class="error-message" id="doctor_degree_error"></div>
+                </div>
+                
+                <div class="form-group">
+                    <input type="email" name="email" placeholder="EMAIL" required>
+                    <div class="error-message" id="email_error"></div>
+                </div>
+                
+                <div class="form-group">
+                    <input type="text" name="license_number" placeholder="LICENSE NUMBER" required>
+                    <div class="error-message" id="license_number_error"></div>
+                </div>
+                
+                <div class="form-group">
+                    <input type="number" name="avg_time_per_patient" placeholder="AVG TIME PER PATIENT (minutes)" min="5" max="60" required>
+                    <div class="error-message" id="avg_time_error"></div>
+                </div>
+                
+                <div class="form-group">
+                    <input type="text" name="location" placeholder="LOCATION" required>
+                    <div class="error-message" id="location_error"></div>
+                </div>
+                
+                <div class="form-group">
+                    <input type="password" name="password" id="password" placeholder="PASSWORD" required minlength="8">
+                    <span class="password-toggle" onclick="togglePassword('password')">Show</span>
+                    <div class="error-message" id="password_error"></div>
+                </div>
+                
+                <div class="form-group">
+                    <input type="password" name="confirm_password" id="confirm_password" placeholder="CONFIRM PASSWORD" required>
+                    <span class="password-toggle" onclick="togglePassword('confirm_password')">Show</span>
+                    <div class="error-message" id="confirm_password_error"></div>
+                </div>
+                
+                <button type="button" onclick="validateAndSubmit()">SIGN UP</button>
+                <div class="success-message" id="success_message"></div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function togglePassword(fieldId) {
+            const field = document.getElementById(fieldId);
+            const toggle = field.nextElementSibling;
+            if (field.type === 'password') {
+                field.type = 'text';
+                toggle.textContent = 'Hide';
+            } else {
+                field.type = 'password';
+                toggle.textContent = 'Show';
+            }
+        }
+
+        function validateAndSubmit() {
+            // Clear previous errors
+            document.querySelectorAll('.error-message').forEach(el => {
+                el.style.display = 'none';
+                el.textContent = '';
+            });
+            document.getElementById('success_message').style.display = 'none';
+
+            // Get form values
+            const form = document.getElementById('signup-form');
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+
+            // Validate fields
+            let isValid = true;
+
+            if (!data.hospital_name.trim()) {
+                showError('hospital_name_error', 'Hospital name is required');
+                isValid = false;
+            }
+
+            if (!data.doctor_name.trim()) {
+                showError('doctor_name_error', 'Doctor name is required');
+                isValid = false;
+            }
+
+            if (!data.doctor_degree.trim()) {
+                showError('doctor_degree_error', 'Doctor degree is required');
+                isValid = false;
+            }
+
+            if (!data.email.trim()) {
+                showError('email_error', 'Email is required');
+                isValid = false;
+            } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
+                showError('email_error', 'Please enter a valid email');
+                isValid = false;
+            }
+
+            if (!data.license_number.trim()) {
+                showError('license_number_error', 'License number is required');
+                isValid = false;
+            }
+
+            if (!data.avg_time_per_patient || data.avg_time_per_patient < 5 || data.avg_time_per_patient > 60) {
+                showError('avg_time_error', 'Please enter a value between 5 and 60 minutes');
+                isValid = false;
+            }
+
+            if (!data.location.trim()) {
+                showError('location_error', 'Location is required');
+                isValid = false;
+            }
+
+            if (!data.password) {
+                showError('password_error', 'Password is required');
+                isValid = false;
+            } else if (data.password.length < 8) {
+                showError('password_error', 'Password must be at least 8 characters');
+                isValid = false;
+            }
+
+            if (data.password !== data.confirm_password) {
+                showError('confirm_password_error', 'Passwords do not match');
+                isValid = false;
+            }
+
+            if (!isValid) return;
+
+            // Submit the form
+            submitForm(data);
+        }
+
+        function showError(elementId, message) {
+            const errorElement = document.getElementById(elementId);
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+        }
+
+        function submitForm(data) {
+            // Remove confirm_password from the data before sending
+            delete data.confirm_password;
+
+            fetch('/admin-signup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show success message
+                    const successMsg = document.getElementById('success_message');
+                    successMsg.textContent = 'Registration successful! Redirecting to login...';
+                    successMsg.style.display = 'block';
+                    
+                    // Reset form
+                    document.getElementById('signup-form').reset();
+                    
+                    // Redirect to login after 2 seconds
+                    setTimeout(() => {
+                        window.location.href = '/admin-login';
+                    }, 2000);
+                } else {
+                    // Show server-side validation errors
+                    if (data.message === 'Email already exists') {
+                        showError('email_error', data.message);
+                    } else if (data.message === 'License number already exists') {
+                        showError('license_number_error', data.message);
+                    } else {
+                        showError('confirm_password_error', data.message || 'Registration failed. Please try again.');
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showError('confirm_password_error', 'An error occurred. Please try again.');
+            });
+        }
+    </script>
+</body>
+</html>

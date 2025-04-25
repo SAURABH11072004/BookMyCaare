@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prescription - BookMyCare</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #fff;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #fff;
+            width: 100%;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            border-bottom: 2px solid #1a3c34; /* Teal border */
+        }
+
+        header a {
+            text-decoration: none;
+            color: #1a3c34; /* Teal */
+            font-size: 40px; /* Larger arrow */
+            font-weight: 900; /* Bolder arrow */
+            margin-right: 0; /* Remove margin to attach "BookMyCare" directly */
+            display: flex;
+            align-items: center;
+        }
+
+        header a::before {
+            content: "←"; /* Unicode for left arrow */
+            font-size: 40px; /* Match the size of the link */
+            font-weight: 900; /* Bolder arrow */
+        }
+
+        header h1 {
+            font-size: 24px;
+            color: #1a3c34; /* Teal */
+            margin: 0;
+            padding-left: 0; /* Ensure no padding to attach directly to arrow */
+            font-weight: bold;
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background-color: #f0f0f0; /* Light gray background */
+        }
+
+        .prescription-container {
+            background-color: #fff;
+            padding: 20px;
+            border: 2px solid #1E90FF; /* Blue border matching screenshot */
+            border-radius: 5px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .prescription-header {
+            text-align: center;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .prescription-header h1 {
+            font-size: 24px;
+            color: #1a3c34; /* Teal */
+            margin: 0;
+            font-weight: bold;
+        }
+
+        .prescription-header h2 {
+            font-size: 18px;
+            color: #1a3c34; /* Teal */
+            margin: 5px 0 10px;
+            font-weight: bold;
+        }
+
+        .prescription-header .doctor-name {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            margin: 0;
+        }
+
+        .prescription-header .qualification {
+            font-size: 14px;
+            color: #666;
+            margin: 0;
+        }
+
+        .prescription-header .logo {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 30px;
+            height: 30px;
+        }
+
+        .prescription-details {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            font-size: 14px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+
+        .prescription-details p {
+            margin: 5px 0;
+            color: #333;
+        }
+
+        .medicines {
+            margin-bottom: 20px;
+        }
+
+        .medicines h3 {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .medicine-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .medicine-list li {
+            border-bottom: 1px dashed #A9A9A9; /* Light gray dashed line */
+            padding: 5px 0;
+            font-size: 14px;
+            color: #333;
+            margin-left: 20px;
+        }
+
+        .signature {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+
+        .signature p {
+            font-size: 14px;
+            color: #333;
+            margin: 5px 0;
+        }
+
+        .signature .line {
+            border-bottom: 1px solid #000;
+            width: 100px;
+            margin-left: auto;
+        }
+
+        .clinic-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #666;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+        }
+
+        .download-btn-container {
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .download-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #1a3c34; /* Teal */
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        .download-btn:hover {
+            background-color: #2a5f55; /* Slightly darker teal */
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="/appointments"></a> <!-- Empty anchor with pseudo-element for arrow -->
+        <h1>BookMyCare</h1>
+    </header>
+
+    <main>
+        <div class="prescription-container">
+            <div class="prescription-header">
+                <h1>BookMyCare</h1>
+                <h2>Prescription</h2>
+                <img src="https://img.icons8.com/ios-filled/50/1E90FF/medical-doctor.png" alt="Medical Logo" class="logo">
+                <p class="doctor-name">Dr. Kishan Sonawane</p>
+                <p class="qualification">BDS</p>
+            </div>
+
+            <div class="prescription-details">
+                <div>
+                    <p>Patient Name: <%= prescription.first_name %> <%= prescription.last_name %></p>
+                    <p>Age: <%= prescription.age %></p>
+                </div>
+                <div>
+                    <p>Gender: <%= prescription.gender %></p>
+                    <p>Weight: <%= prescription.weight || 'N/A' %> Kgs</p>
+                </div>
+                <div>
+                    <p>Date: <%= prescription.appointment_date.toISOString().split('T')[0] %></p>
+                </div>
+            </div>
+
+            <div class="medicines">
+                <h3>Medicines Prescribed:</h3>
+                <ul class="medicine-list">
+                    <% 
+                        const medicines = prescription.medicines ? JSON.parse(prescription.medicines) : [];
+                        for (let i = 0; i < 6; i++) {
+                            const medicine = medicines[i] || '';
+                    %>
+                        <li><%= i + 1 %>. <%= medicine %></li>
+                    <% } %>
+                </ul>
+            </div>
+
+            <div class="signature">
+                <p>Signature</p>
+                <div class="line"></div>
+            </div>
+
+            <div class="clinic-info">
+                <div>
+                    <p>CLINIC NAME</p>
+                    <p>Pradhikaran</p>
+                </div>
+                <div>
+                    <p>9175925216</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="download-btn-container">
+        <a href="/download-prescription/<%= prescription.id %>" class="download-btn">Download as PDF</a>
+    </div>
+</body>
+</html>

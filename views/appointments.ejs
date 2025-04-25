@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/css/globals.css">
+  <link rel="stylesheet" href="/css/appointments.css">
+  <title>Appointments</title>
+</head>
+<body>
+  <div class="appointments-container">
+    <h1>Your Appointments</h1>
+    
+    <% if (appointments && appointments.length > 0) { %>
+      <ul class="appointments-list">
+        <% appointments.forEach(appointment => { %>
+          <li class="appointment-item">
+            <div class="appointment-details">
+              <p><strong>Name:</strong> <%= appointment.first_name %> <%= appointment.last_name %></p>
+              <p><strong>Doctor:</strong> <%= appointment.doctor_name %></p>
+              <p><strong>Date:</strong> <%= new Date(appointment.appointment_date).toLocaleDateString() %></p>
+              <p><strong>Time:</strong> <%= appointment.appointment_time %></p>
+              <p><strong>Status:</strong> <%= appointment.status %></p>
+            </div>
+            <% if (appointment.prescription) { %>
+              <button class="view-prescription-button" onclick="viewPrescription('<%= appointment.id %>')">View Prescription</button>
+            <% } else { %>
+              <p>No prescription available</p>
+            <% } %>
+          </li>
+
+          <!-- Modal for Viewing Prescription (specific to each appointment) -->
+          <div id="prescriptionModal_<%= appointment.id %>" class="modal">
+            <div class="modal-content">
+              <span class="close" onclick="closeModal('<%= appointment.id %>')">×</span>
+              <h3>Prescription</h3>
+              <div class="prescription-header">
+                <p><strong>Patient:</strong> <span id="viewPatientName_<%= appointment.id %>"></span></p>
+                <p><strong>Age:</strong> <span id="viewAge_<%= appointment.id %>"></span></p>
+                <p><strong>Gender:</strong> <span id="viewGender_<%= appointment.id %>"></span></p>
+                <p><strong>Date:</strong> <span id="viewDate_<%= appointment.id %>"></span></p>
+                <p><strong>Doctor:</strong> <span id="viewDoctorName_<%= appointment.id %>"></span></p>
+                <p><strong>Hospital:</strong> <span id="viewHospital_<%= appointment.id %>"></span></p>
+                <p><strong>License:</strong> <span id="viewLicense_<%= appointment.id %>"></span></p>
+              </div>
+              <div class="prescription-body">
+                <h4>Medicines</h4>
+                <table id="prescriptionTable_<%= appointment.id %>" class="prescription-table">
+                  <thead>
+                    <tr>
+                      <th>Medicine</th>
+                      <th>Dosage</th>
+                      <th>Duration</th>
+                      <th>Instructions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="medicineList_<%= appointment.id %>"></tbody>
+                </table>
+                <div class="notes-section">
+                  <h4>Notes</h4>
+                  <p id="prescriptionNotes_<%= appointment.id %>"></p>
+                </div>
+              </div>
+              <button class="download-button" onclick="downloadPrescription('<%= appointment.id %>')">Download PDF</button>
+            </div>
+          </div>
+        <% }) %>
+      </ul>
+    <% } else { %>
+      <p>You have no appointments yet.</p>
+    <% } %>
+    
+    <a href="/create-appointment" class="button">Create New Appointment</a>
+    <a href="/profile" class="button">Back to Profile</a>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    // Close modal
+    function closeModal(appointmentId) {
+      document.getElementById(`prescriptionModal_${appointmentId}`).style.display = 'none';
+    }
+
+    // View prescription
+    async function viewPrescription(appointmentId) {
+      try {
+        const response = await fetch(`/prescription/${appointmentId}`);
+        const data = await response.json();
+        
+        if (data.success) {
+          document.getElementById(`viewPatientName_${appointmentId}`).textContent = `${data.first_name} ${data.last_name}`;
+          document.getElementById(`viewAge_${appointmentId}`).textContent = data.age || 'N/A';
+          document.getElementById(`viewGender_${appointmentId}`).textContent = data.gender || 'N/A';
+          document.getElementById(`viewDate_${appointmentId}`).textContent = new Date(data.appointment_date).toLocaleDateString();
+          document.getElementById(`viewDoctorName_${appointmentId}`).textContent = data.doctor_name || 'N/A';
+          document.getElementById(`viewHospital_${appointmentId}`).textContent = data.hospital_name || 'N/A';
+          document.getElementById(`viewLicense_${appointmentId}`).textContent = data.license_number || 'N/A';
+
+          const medicineList = document.getElementById(`medicineList_${appointmentId}`);
+          const medicines = typeof data.prescription === 'string'
+            ? data.prescription.split('\n').map(line => {
+                const [name, dosage, duration, instructions] = line.split(',');
+                return { name: name || 'N/A', dosage: dosage || 'N/A', duration: duration || 'N/A', instructions: instructions || 'N/A' };
+              })
+            : (data.prescription.medicines || []);
+          
+          medicineList.innerHTML = medicines.map(med => `
+            <tr>
+              <td>${med.name}</td>
+              <td>${med.dosage}</td>
+              <td>${med.duration}</td>
+              <td>${med.instructions}</td>
+            </tr>
+          `).join('');
+
+          document.getElementById(`prescriptionNotes_${appointmentId}`).textContent = data.prescription.notes || 'No additional notes';
+          document.getElementById(`prescriptionModal_${appointmentId}`).style.display = 'block';
+        } else {
+          alert('Error: ' + (data.message || 'Failed to load prescription'));
+        }
+      } catch (error) {
+        console.error('Error fetching prescription:', error);
+        alert('Failed to load prescription due to a server error. Check console for details.');
+      }
+    }
+
+    // Download prescription
+    function downloadPrescription(appointmentId) {
+      window.location.href = `/download-prescription/${appointmentId}`;
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+      appointments.forEach(appointment => {
+        const modal = document.getElementById(`prescriptionModal_${appointment.id}`);
+        if (event.target == modal) {
+          modal.style.display = 'none';
+        }
+      });
+    };
+  </script>
+
+  <style>
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.4);
+    }
+
+    .modal-content {
+      background-color: #fefefe;
+      margin: 15% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%;
+      max-width: 600px;
+      border-radius: 5px;
+    }
+
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .prescription-header {
+      margin-bottom: 20px;
+    }
+
+    .prescription-header p {
+      margin: 5px 0;
+    }
+
+    .prescription-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+
+    .prescription-table th,
+    .prescription-table td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+
+    .prescription-table th {
+      background-color: #f2f2f2;
+    }
+
+    .notes-section {
+      margin-top: 20px;
+    }
+
+    .view-prescription-button {
+      background-color: #00a1a7;
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      text-decoration: none;
+      margin-top: 10px;
+      display: inline-block;
+    }
+
+    .view-prescription-button:hover {
+      background-color: #007a7e;
+    }
+
+    .download-button {
+      background-color: #28a745;
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+      display: inline-block;
+    }
+
+    .download-button:hover {
+      background-color: #218838;
+    }
+  </style>
+</body>
+</html>

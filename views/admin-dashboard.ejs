@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookMyCare Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0, 0, 0, 0.4); }
+        .modal-content { background-color: #fff; margin: 10% auto; padding: 20px; border: 1px solid #ddd; width: 90%; max-width: 800px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); position: relative; }
+        .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
+        .close:hover, .close:focus { color: black; text-decoration: none; cursor: pointer; }
+        pre { white-space: pre-wrap; word-wrap: break-word; background: #f9f9f9; padding: 15px; border-radius: 5px; border-left: 4px solid #007bff; font-family: 'Courier New', Courier, monospace; }
+        button { padding: 10px 20px; margin: 5px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background-color: #45a049; }
+        .btn.btn-primary { background-color: #007bff; }
+        .btn.btn-primary:hover { background-color: #0056b3; }
+        .btn.btn-secondary { background-color: #6c757d; }
+        .btn.btn-secondary:hover { background-color: #5a6268; }
+        .btn.btn-sm.btn-danger { background-color: #dc3545; }
+        .btn.btn-sm.btn-danger:hover { background-color: #c82333; }
+        .prescription-btn { background-color: #007bff; padding: 5px 10px; }
+        .prescription-btn:hover { background-color: #0056b3; }
+        .view-prescription-btn { background-color: #28a745; padding: 5px 10px; margin-top: 5px; }
+        .view-prescription-btn:hover { background-color: #218838; }
+        .add-medicine-btn { margin-top: 10px; }
+        .medicine-item { margin-bottom: 15px; }
+        .medicine-details { display: none; margin-top: 10px; }
+        .form-row { display: flex; gap: 10px; }
+        .form-group { flex: 1; }
+        .form-control { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+        .patient-actions { margin-top: 20px; text-align: right; }
+        .prescription-header { margin-bottom: 20px; border-bottom: 2px solid #007bff; padding-bottom: 10px; }
+        .no-data { color: #888; text-align: center; padding: 10px; }
+        .visits-today { display: flex; justify-content: space-between; align-items: center; background-color: #e6f0fa; padding: 20px; border-radius: 10px; margin-bottom: 20px; }
+        .doctor-image img { width: 100px; height: 100px; }
+        .patient-details { margin-bottom: 10px; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+        /* Enhanced Prescription Modal Styling */
+        #viewPrescriptionModal .modal-content {
+            max-width: 900px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #fff 100%);
+        }
+        #viewPrescriptionModal h2 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: 600;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        #viewPrescriptionModal .prescription-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        #viewPrescriptionModal .prescription-info p {
+            margin: 5px 0;
+            font-size: 14px;
+            color: #555;
+            font-family: Arial, sans-serif;
+        }
+        #viewPrescriptionModal .prescription-info p strong {
+            color: #007bff;
+            margin-right: 10px;
+        }
+        #viewPrescriptionModal #prescriptionContent {
+            background: #fff;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-left: 5px solid #007bff;
+            border-radius: 5px;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #333;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        #viewPrescriptionModal button {
+            margin-top: 10px;
+        }
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            #viewPrescriptionModal .prescription-info {
+                grid-template-columns: 1fr;
+            }
+            #viewPrescriptionModal .modal-content {
+                width: 95%;
+                margin: 20% auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <img src="/images/boxes.png" alt="Dashboard Icon">
+        <img src="/images/list-symbol-of-three-items-with-dots.png" alt="Previous Patients Icon" onclick="showPreviousPatients()">
+        <img src="/images/logout.png" alt="Logout Icon" onclick="handleLogout()">
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <div class="logo">
+                <img src="/images/logo.png" alt="BookMyCare Logo">
+                <h1>BookMyCare Dashboard</h1>
+            </div>
+            <div class="user-info">
+                <img src="/images/doctor.png" alt="Doctor Avatar" onclick="toggleDropdown()">
+                <span>Dr. <%= admin.name %></span>
+                <div class="dropdown" id="userDropdown">
+                    <a href="#" onclick="showEditProfile()">Edit Profile</a>
+                    <a href="#" onclick="handleLogout()">Logout</a>
+                </div>
+            </div>
+        </div>
+
+        <input type="text" class="search-bar" id="patientSearchBar" placeholder="Search patients..." oninput="debouncedSearchPatients(this.value)">
+
+        <% if (error) { %>
+            <div class="error-message"><%= error %></div>
+        <% } %>
+
+        <div class="greeting">Good Morning Dr. <%= admin.name %></div>
+
+        <div class="visits-today">
+            <div class="stats">
+                <h2>Visits for <span id="selectedDate"><%= new Date(selectedDate).toLocaleDateString('default', { month: 'long', day: 'numeric', year: 'numeric' }) %></span></h2>
+                <h2 id="totalVisits"><%= totalVisits || 0 %></h2>
+                <div class="patient-types">
+                    <div>
+                        <p>New Patients</p>
+                        <p id="newPatients"><%= newPatients || 0 %></p>
+                    </div>
+                    <div>
+                        <p>Old Patients</p>
+                        <p id="oldPatients"><%= oldPatients || 0 %></p>
+                    </div>
+                </div>
+            </div>
+            <div class="doctor-image"><img src="/images/doctor.png" alt="Doctor"></div>
+        </div>
+
+        <div class="calendar">
+            <h3><%= new Date(calendar.year, calendar.month - 1).toLocaleString('default', { month: 'long' }) %> <%= calendar.year %></h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>SUN</th>
+                        <th>MON</th>
+                        <th>TUE</th>
+                        <th>WED</th>
+                        <th>THU</th>
+                        <th>FRI</th>
+                        <th>SAT</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% let dayIndex = 0; %>
+                    <% for (let i = 0; i < Math.ceil(calendar.days.length / 7); i++) { %>
+                        <tr>
+                            <% for (let j = 0; j < 7; j++) { %>
+                                <% if (dayIndex < calendar.days.length) { %>
+                                    <% const day = calendar.days[dayIndex]; %>
+                                    <td class="<%= day === calendar.today ? 'today' : '' %> <%= calendar.appointments[day] ? 'has-appointment' : '' %>"
+                                        onclick="fetchVisitsForDate('<%= calendar.year %>-<%= String(calendar.month).padStart(2, '0') %>-<%= String(day).padStart(2, '0') %>')">
+                                        <%= day || '' %>
+                                    </td>
+                                    <% dayIndex++; %>
+                                <% } else { %>
+                                    <td></td>
+                                <% } %>
+                            <% } %>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="patient-list">
+            <div class="section">
+                <h3>Ongoing</h3>
+                <div id="ongoingAppointments">
+                    <% if (ongoingAppointments && ongoingAppointments.length > 0) { %>
+                        <% ongoingAppointments.forEach(appointment => { %>
+                            <div class="patient">
+                                <div class="patient-row">
+                                    <div class="info" onclick="showPatientDetails('<%= appointment.id %>', 'ongoing')">
+                                        <div class="avatar"><%= appointment.first_name.charAt(0) + appointment.last_name.charAt(0) %></div>
+                                        <div class="details">
+                                            <p><%= appointment.first_name %> <%= appointment.last_name %></p>
+                                            <p>Token: <%= appointment.token_number || 'Not assigned' %></p>
+                                        </div>
+                                    </div>
+                                    <button class="prescription-btn" onclick="showPrescriptionForm('<%= appointment.id %>', '<%= appointment.first_name %> <%= appointment.last_name %>')">Create Prescription</button>
+                                </div>
+                            </div>
+                        <% }) %>
+                    <% } else { %>
+                        <div class="no-data">No ongoing appointments.</div>
+                    <% } %>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Upcoming</h3>
+                <div id="upcomingAppointments">
+                    <% if (upcomingAppointments && upcomingAppointments.length > 0) { %>
+                        <% upcomingAppointments.forEach(appointment => { %>
+                            <div class="patient" onclick="showPatientDetails('<%= appointment.id %>', 'upcoming')">
+                                <div class="info">
+                                    <div class="avatar"><%= appointment.first_name.charAt(0) + appointment.last_name.charAt(0) %></div>
+                                    <div class="details">
+                                        <p><%= appointment.first_name %> <%= appointment.last_name %></p>
+                                        <p>Token: <%= appointment.token_number || 'Not assigned' %></p>
+                                    </div>
+                                </div>
+                            </div>
+                        <% }) %>
+                    <% } else { %>
+                        <div class="no-data">No upcoming appointments.</div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Search Results -->
+    <div id="searchResultsModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('searchResultsModal')">×</span>
+            <h3>Search Results</h3>
+            <div id="searchResultsList"></div>
+        </div>
+    </div>
+
+    <!-- Modal for Patient Details -->
+    <div id="patientModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('patientModal')">×</span>
+            <h3>Patient Details</h3>
+            <div id="patientDetails"></div>
+            <div class="patient-actions">
+                <button type="button" class="prescription-btn" id="createPrescriptionBtn">Create Prescription</button>
+                <button type="button" class="view-prescription-btn" id="viewPrescriptionBtn">View Prescription</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Previous Patients -->
+    <div id="previousPatientsModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('previousPatientsModal')">×</span>
+            <h3>Previous Patients</h3>
+            <div id="previousPatientsList"></div>
+        </div>
+    </div>
+
+    <!-- Modal for Edit Profile -->
+    <div id="editProfileModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('editProfileModal')">×</span>
+            <h3>Edit Profile</h3>
+            <form id="editProfileForm">
+                <label for="hospital_name">Hospital Name:</label>
+                <input type="text" id="hospital_name" name="hospital_name" required>
+
+                <label for="doctor_name">Doctor Name:</label>
+                <input type="text" id="doctor_name" name="doctor_name" required>
+
+                <label for="doctor_degree">Doctor Degree:</label>
+                <input type="text" id="doctor_degree" name="doctor_degree" required>
+
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+
+                <label for="license_number">License Number:</label>
+                <input type="text" id="license_number" name="license_number" required>
+
+                <label for="avg_time_per_patient">Average Time Per Patient (minutes):</label>
+                <input type="number" id="avg_time_per_patient" name="avg_time_per_patient" required>
+
+                <label for="location">Location:</label>
+                <input type="text" id="location" name="location" required>
+
+                <label for="password">Password (leave blank to keep unchanged):</label>
+                <input type="password" id="password" name="password">
+
+                <button type="button" onclick="updateProfile()">Update Profile</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal for Prescription Form -->
+    <div id="prescriptionModal" class="modal">
+        <div class="modal-content" style="max-width: 700px;">
+            <span class="close" onclick="closeModal('prescriptionModal')">×</span>
+            <h3>Create Prescription</h3>
+            <div class="prescription-header">
+                <p><strong>Patient:</strong> <span id="prescriptionPatientName"></span></p>
+                <p><strong>Doctor:</strong> <span id="prescriptionDoctorName"></span></p>
+                <p><strong>Date:</strong> <span id="prescriptionDate"></span></p>
+            </div>
+            
+            <div class="prescription-form">
+                <h4>Medicines</h4>
+                <div id="medicinesContainer">
+                    <!-- Medicine items will be added here -->
+                </div>
+                
+                <button type="button" onclick="addMedicineField()" class="add-medicine-btn">
+                    <i class="fas fa-plus"></i> Add Medicine
+                </button>
+                
+                <div class="form-group">
+                    <label for="prescriptionNotes">Additional Notes</label>
+                    <textarea id="prescriptionNotes" rows="3" class="form-control" 
+                        placeholder="Enter any additional notes..."></textarea>
+                </div>
+                
+                <div class="prescription-actions">
+                    <button type="button" onclick="savePrescription()" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Save Prescription
+                    </button>
+                    <button type="button" onclick="closeModal('prescriptionModal')" class="btn btn-secondary">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Viewing Prescription -->
+    <div id="viewPrescriptionModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('viewPrescriptionModal')">×</span>
+            <h2>Prescription Details</h2>
+            <div class="prescription-info">
+                <p><strong>Patient Name:</strong> <span id="viewPatientName"></span></p>
+                <p><strong>Doctor Name:</strong> <span id="viewDoctorName"></span></p>
+                <p><strong>Hospital:</strong> <span id="viewHospital"></span></p>
+                <p><strong>License:</strong> <span id="viewLicense"></span></p>
+                <p><strong>Age:</strong> <span id="viewAge"></span></p>
+                <p><strong>Gender:</strong> <span id="viewGender"></span></p>
+                <p><strong>Date:</strong> <span id="viewDate"></span></p>
+            </div>
+            <div id="prescriptionContent"></div>
+            <button onclick="downloadPrescription()">Download PDF</button>
+            <button type="button" onclick="closeModal('viewPrescriptionModal')" class="btn btn-secondary">Close</button>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <script>
+        let selectedAppointmentId = null;
+        let selectedType = null;
+        let selectedDate = '<%= selectedDate %>';
+        let currentPatientName = '';
+
+        // Debounce function to limit search requests
+        function debounce(func, delay) {
+            let timeoutId;
+            return function (...args) {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => func.apply(this, args), delay);
+            };
+        }
+
+        // Search patients by name
+        async function searchPatients(query) {
+            if (query.length < 2) {
+                closeModal('searchResultsModal');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/admin/search-patients?query=${encodeURIComponent(query)}`, {
+                    headers: { 'Content-Type': 'application/json' },
+                });
+                const data = await response.json();
+                console.log('Search patients response:', data);
+                if (data.success) {
+                    const searchResultsList = document.getElementById('searchResultsList');
+                    if (data.patients.length === 0) {
+                        searchResultsList.innerHTML = '<p>No patients found.</p>';
+                    } else {
+                        searchResultsList.innerHTML = data.patients.map(patient => `
+                            <div class="patient" onclick="showPatientDetails('${patient.id}', 'search')">
+                                <div class="info">
+                                    <div class="avatar">${patient.first_name.charAt(0)}${patient.last_name.charAt(0)}</div>
+                                    <div class="details">
+                                        <p>${patient.first_name} ${patient.last_name}</p>
+                                        <p>Phone: ${patient.phone_number || 'N/A'}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('');
+                    }
+                    document.getElementById('searchResultsModal').style.display = 'flex';
+                } else {
+                    alert('Failed to search patients: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Error searching patients:', error);
+                alert('Error searching patients: ' + error.message);
+            }
+        }
+
+        const debouncedSearchPatients = debounce(searchPatients, 300);
+
+        // Toggle dropdown menu
+        function toggleDropdown() {
+            const dropdown = document.getElementById('userDropdown');
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        }
+
+        // Fetch visits for a specific date and refresh dashboard
+        async function fetchVisitsForDate(date) {
+            try {
+                const response = await fetch(`/admin/visits?date=${date}`, {
+                    headers: { 'Content-Type': 'application/json' },
+                });
+                const data = await response.json();
+                console.log('Fetch visits response:', data);
+                if (data.success) {
+                    selectedDate = date;
+                    document.getElementById('selectedDate').textContent = new Date(date).toLocaleDateString('default', { month: 'long', day: 'numeric', year: 'numeric' });
+                    document.getElementById('totalVisits').textContent = data.stats.totalVisits;
+                    document.getElementById('newPatients').textContent = data.stats.newPatients;
+                    document.getElementById('oldPatients').textContent = data.stats.oldPatients;
+                    await updatePatientLists(date);
+                } else {
+                    alert('Failed to fetch visits: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Error fetching visits:', error);
+                alert('Error fetching visits for the selected date: ' + error.message);
+            }
+        }
+
+        // Show patient details in modal
+        async function showPatientDetails(appointmentId, type) {
+            selectedAppointmentId = appointmentId;
+            selectedType = type;
+            try {
+                const response = await fetch(`/admin/patient-details/${appointmentId}`, {
+                    headers: { 'Content-Type': 'application/json' },
+                });
+                const data = await response.json();
+                console.log('Patient details response:', data);
+                if (data.success) {
+                    const patient = data.patient;
+                    currentPatientName = `${patient.first_name} ${patient.last_name}`;
+                    
+                    const detailsDiv = document.getElementById('patientDetails');
+                    detailsDiv.innerHTML = `
+                        <div class="patient-details">
+                            <p><strong>Name:</strong> ${patient.first_name} ${patient.last_name}</p>
+                            <p><strong>Gender:</strong> ${patient.gender || 'N/A'}</p>
+                            <p><strong>Phone Number:</strong> ${patient.phone_number || 'N/A'}</p>
+                            <p><strong>Age:</strong> ${patient.age || 'N/A'}</p>
+                            <p><strong>Location:</strong> ${patient.location || 'N/A'}</p>
+                            <p><strong>Appointment Date:</strong> ${patient.appointment_date}</p>
+                            <p><strong>Appointment Time:</strong> ${patient.appointment_time}</p>
+                            <p><strong>Token Number:</strong> ${patient.token_number || 'Not generated'}</p>
+                            <p><strong>Status:</strong> ${patient.status}</p>
+                        </div>
+                    `;
+                    
+                    document.getElementById('createPrescriptionBtn').onclick = () => showPrescriptionForm(appointmentId, currentPatientName);
+                    document.getElementById('viewPrescriptionBtn').onclick = () => viewPrescription(appointmentId, currentPatientName);
+                    
+                    if (type === 'ongoing') {
+                        document.getElementById('createPrescriptionBtn').style.display = 'block';
+                        document.getElementById('viewPrescriptionBtn').style.display = patient.prescription ? 'block' : 'none';
+                    } else {
+                        document.getElementById('createPrescriptionBtn').style.display = 'none';
+                        document.getElementById('viewPrescriptionBtn').style.display = patient.prescription ? 'block' : 'none';
+                    }
+                    
+                    closeModal('searchResultsModal');
+                    document.getElementById('patientModal').style.display = 'flex';
+                } else {
+                    alert('Failed to fetch patient details: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Error fetching patient details:', error);
+                alert('Error fetching patient details: ' + error.message);
+            }
+        }
+
+        // Show prescription form
+        function showPrescriptionForm(appointmentId, patientName) {
+            closeModal('patientModal');
+            selectedAppointmentId = appointmentId;
+            document.getElementById('prescriptionPatientName').textContent = patientName;
+            document.getElementById('prescriptionDoctorName').textContent = '<%= admin.doctor_name %>';
+            document.getElementById('prescriptionDate').textContent = new Date().toLocaleDateString();
+            document.getElementById('medicinesContainer').innerHTML = '';
+            document.getElementById('prescriptionNotes').value = '';
+            addMedicineField();
+            document.getElementById('prescriptionModal').style.display = 'flex';
+        }
+
+        // Add medicine field
+        function addMedicineField() {
+            const container = document.getElementById('medicinesContainer');
+            const medicineId = Date.now();
+            
+            const div = document.createElement('div');
+            div.className = 'medicine-item';
+            div.id = `medicine-${medicineId}`;
+            div.innerHTML = `
+                <div class="medicine-search-container">
+                    <select class="medicine-select" style="width:100%" onchange="medicineSelected(this, ${medicineId})">
+                        <option></option>
+                    </select>
+                </div>
+                <div class="medicine-details" id="medicine-details-${medicineId}">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label>Dosage</label>
+                            <input type="text" class="form-control medicine-dosage" placeholder="e.g., 500mg">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label>Duration</label>
+                            <input type="text" class="form-control medicine-duration" placeholder="e.g., 7 days">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Instructions</label>
+                        <textarea class="form-control medicine-instructions" placeholder="Special instructions"></textarea>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-danger" onclick="removeMedicine(${medicineId})">Remove</button>
+                </div>
+            `;
+            
+            container.appendChild(div);
+            
+            $(`#medicine-${medicineId} .medicine-select`).select2({
+                placeholder: "Search medicine...",
+                minimumInputLength: 3,
+                ajax: {
+                    url: '/api/medicine-suggestions',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                        return { query: params.term };
+                    },
+                    processResults: function (data) {
+                        return {
+                            results: data.map(med => ({
+                                id: med.name,
+                                text: med.name,
+                                dosage: med.dosage,
+                                description: med.description
+                            }))
+                        };
+                    },
+                    cache: true
+                }
+            });
+        }
+
+        function medicineSelected(selectElement, medicineId) {
+            const selectedOption = selectElement.options[selectElement.selectedIndex];
+            const detailsDiv = document.getElementById(`medicine-details-${medicineId}`);
+            if (selectedOption.value) {
+                detailsDiv.style.display = 'block';
+                const dosageInput = detailsDiv.querySelector('.medicine-dosage');
+                if (selectedOption.dataset.dosage) dosageInput.value = selectedOption.dataset.dosage;
+            } else {
+                detailsDiv.style.display = 'none';
+            }
+        }
+
+        function removeMedicine(id) {
+            const element = document.getElementById(`medicine-${id}`);
+            if (element) element.remove();
+        }
+
+        // Save prescription and update patient lists
+        async function savePrescription() {
+            const medicineItems = document.querySelectorAll('.medicine-item');
+            const medicines = [];
+            
+            medicineItems.forEach(item => {
+                const name = item.querySelector('.medicine-select')?.value;
+                if (name) {
+                    medicines.push({
+                        name: name,
+                        dosage: item.querySelector('.medicine-dosage')?.value || '',
+                        duration: item.querySelector('.medicine-duration')?.value || '',
+                        instructions: item.querySelector('.medicine-instructions')?.value || ''
+                    });
+                }
+            });
+            
+            if (medicines.length === 0) {
+                alert('Please add at least one medicine');
+                return;
+            }
+            
+            const notes = document.getElementById('prescriptionNotes').value.trim();
+            
+            try {
+                const response = await fetch(`/admin/save-prescription/${selectedAppointmentId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ medicines, notes })
+                });
+                const data = await response.json();
+                console.log('Save prescription response:', data);
+                if (data.success) {
+                    alert('Prescription saved and appointment completed successfully');
+                    closeModal('prescriptionModal');
+                    await fetchVisitsForDate(selectedDate);
+                    await updatePatientLists(selectedDate);
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Error saving prescription:', error);
+                alert('Failed to save prescription: ' + error.message);
+            }
+        }
+
+        // Download prescription as PDF
+        async function downloadPrescription() {
+            if (!selectedAppointmentId) {
+                alert('No appointment selected for download.');
+                return;
+            }
+            try {
+                window.location.href = `/admin/prescription-pdf/${selectedAppointmentId}`;
+            } catch (error) {
+                console.error('Error downloading prescription:', error);
+                alert('Failed to download prescription: ' + error.message);
+            }
+        }
+
+        // View prescription with enhanced formatting
+        async function viewPrescription(appointmentId, patientName) {
+            selectedAppointmentId = appointmentId;
+            try {
+                const response = await fetch(`/admin/prescription/${appointmentId}`);
+                const data = await response.json();
+                console.log('View prescription response:', data);
+                if (data.success) {
+                    document.getElementById('viewPatientName').textContent = data.patientInfo.name;
+                    document.getElementById('viewDoctorName').textContent = data.doctorInfo.name;
+                    document.getElementById('viewHospital').textContent = data.doctorInfo.hospital;
+                    document.getElementById('viewLicense').textContent = data.doctorInfo.license;
+                    document.getElementById('viewAge').textContent = data.patientInfo.age || 'N/A';
+                    document.getElementById('viewGender').textContent = data.patientInfo.gender || 'N/A';
+                    document.getElementById('viewDate').textContent = new Date().toLocaleDateString();
+                    
+                    // Enhanced prescription content formatting
+                    const prescriptionText = data.prescription || 'No prescription available';
+                    let formattedContent = `<h3 style="color: #007bff; margin-bottom: 15px;">Prescription</h3>`;
+                    if (prescriptionText.includes('Medicine:')) {
+                        const lines = prescriptionText.split('\n');
+                        let medicineSection = '<ul style="list-style-type: none; padding-left: 0;">';
+                        lines.forEach(line => {
+                            if (line.trim().startsWith('Medicine:')) {
+                                medicineSection += `<li style="margin-bottom: 10px; padding: 10px; background: #f9f9f9; border-radius: 5px;"><strong>${line.trim()}</strong></li>`;
+                            } else if (line.trim()) {
+                                medicineSection += `<li style="margin-left: 20px; color: #555;">${line.trim()}</li>`;
+                            }
+                        });
+                        medicineSection += '</ul>';
+                        formattedContent += medicineSection;
+                    } else {
+                        formattedContent += `<p style="color: #555;">${prescriptionText}</p>`;
+                    }
+                    document.getElementById('prescriptionContent').innerHTML = formattedContent;
+                    closeModal('patientModal');
+                    document.getElementById('viewPrescriptionModal').style.display = 'flex';
+                } else {
+                    alert(data.message || 'Failed to load prescription');
+                    console.error('Prescription fetch error:', data.error || 'No detailed error');
+                }
+            } catch (error) {
+                console.error('Error fetching prescription:', error);
+                alert('Failed to load prescription: ' + error.message);
+            }
+        }
+
+        // Show previous patients with View Prescription option
+        async function showPreviousPatients() {
+            try {
+                const response = await fetch('/admin/previous-patients', {
+                    headers: { 'Content-Type': 'application/json' },
+                });
+                const data = await response.json();
+                console.log('Previous patients response:', data);
+                if (data.success) {
+                    const patientsList = document.getElementById('previousPatientsList');
+                    if (data.patients.length === 0) {
+                        patientsList.innerHTML = '<p>No previous patients found.</p>';
+                    } else {
+                        patientsList.innerHTML = data.patients.map(patient => `
+                            <div class="patient-details">
+                                <p><strong>Name:</strong> ${patient.first_name} ${patient.last_name}</p>
+                                <p><strong>Gender:</strong> ${patient.gender || 'N/A'}</p>
+                                <p><strong>Phone Number:</strong> ${patient.phone_number || 'N/A'}</p>
+                                <p><strong>Age:</strong> ${patient.age || 'N/A'}</p>
+                                <p><strong>Location:</strong> ${patient.location || 'N/A'}</p>
+                                <p><strong>Appointment Date:</strong> ${patient.appointment_date}</p>
+                                <p><strong>Appointment Time:</strong> ${patient.appointment_time}</p>
+                                <p><strong>Token Number:</strong> ${patient.token_number || 'N/A'}</p>
+                                <p><strong>Status:</strong> ${patient.status}</p>
+                                <p><strong>Prescription:</strong> ${patient.prescription ? patient.prescription.substring(0, 50) + '...' : 'Not available'}</p>
+                                <button class="view-prescription-btn" onclick="viewPrescription('${patient.id}', '${patient.first_name} ${patient.last_name}')">View Prescription</button>
+                            </div>
+                        `).join('');
+                    }
+                    document.getElementById('previousPatientsModal').style.display = 'flex';
+                } else {
+                    alert('Failed to fetch previous patients: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Error fetching previous patients:', error);
+                alert('Error fetching previous patients: ' + error.message);
+            }
+        }
+
+        // Close modal
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Update patient lists dynamically
+        async function updatePatientLists(date = selectedDate) {
+            console.log('Updating patient lists for date:', date);
+            try {
+                const response = await fetch(`/admin/appointments-by-token?date=${encodeURIComponent(date)}`, {
+                    headers: { 'Content-Type': 'application/json' },
+                });
+                console.log('Fetch response status:', response.status, response.statusText);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
+                }
+                const data = await response.json();
+                console.log('Fetch response data:', data);
+                if (data.success) {
+                    const ongoingDiv = document.getElementById('ongoingAppointments');
+                    const upcomingDiv = document.getElementById('upcomingAppointments');
+
+                    if (data.ongoingAppointments && data.ongoingAppointments.length > 0) {
+                        ongoingDiv.innerHTML = data.ongoingAppointments.map(appointment => `
+                            <div class="patient">
+                                <div class="patient-row">
+                                    <div class="info" onclick="showPatientDetails('${appointment.id}', 'ongoing')">
+                                        <div class="avatar">${appointment.first_name.charAt(0)}${appointment.last_name.charAt(0)}</div>
+                                        <div class="details">
+                                            <p>${appointment.first_name} ${appointment.last_name}</p>
+                                            <p>Token: ${appointment.token_number || 'Not assigned'}</p>
+                                        </div>
+                                    </div>
+                                    <button class="prescription-btn" onclick="showPrescriptionForm('${appointment.id}', '${appointment.first_name} ${appointment.last_name}')">Create Prescription</button>
+                                </div>
+                            </div>
+                        `).join('');
+                    } else {
+                        ongoingDiv.innerHTML = '<div class="no-data">No ongoing appointments.</div>';
+                    }
+
+                    if (data.upcomingAppointments && data.upcomingAppointments.length > 0) {
+                        upcomingDiv.innerHTML = data.upcomingAppointments.map(appointment => `
+                            <div class="patient" onclick="showPatientDetails('${appointment.id}', 'upcoming')">
+                                <div class="info">
+                                    <div class="avatar">${appointment.first_name.charAt(0)}${appointment.last_name.charAt(0)}</div>
+                                    <div class="details">
+                                        <p>${appointment.first_name} ${appointment.last_name}</p>
+                                        <p>Token: ${appointment.token_number || 'Not assigned'}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('');
+                    } else {
+                        upcomingDiv.innerHTML = '<div class="no-data">No upcoming appointments.</div>';
+                    }
+                } else {
+                    console.warn('Server reported failure:', data.message);
+                    document.getElementById('ongoingAppointments').innerHTML = '<div class="no-data">Error loading ongoing appointments: ' + data.message + '</div>';
+                    document.getElementById('upcomingAppointments').innerHTML = '<div class="no-data">Error loading upcoming appointments: ' + data.message + '</div>';
+                }
+            } catch (error) {
+                console.error('Error updating patient lists:', error);
+                const ongoingDiv = document.getElementById('ongoingAppointments');
+                const upcomingDiv = document.getElementById('upcomingAppointments');
+                ongoingDiv.innerHTML = '<div class="no-data">Error loading ongoing appointments: ' + error.message + '</div>';
+                upcomingDiv.innerHTML = '<div class="no-data">Error loading upcoming appointments: ' + error.message + '</div>';
+            }
+        }
+
+        // Check and update patient lists every 30 seconds
+        setInterval(() => updatePatientLists(selectedDate), 30000);
+
+        // Refresh dashboard after booking
+        window.refreshDashboard = async function() {
+            await fetchVisitsForDate(selectedDate);
+            await updatePatientLists(selectedDate);
+        };
+
+        // Show edit profile modal
+        async function showEditProfile() {
+            try {
+                const response = await fetch('/admin/profile', {
+                    headers: { 'Content-Type': 'application/json' },
+                });
+                const data = await response.json();
+                console.log('Edit profile response:', data);
+                if (data.success) {
+                    const admin = data.admin;
+                    document.getElementById('hospital_name').value = admin.hospital_name;
+                    document.getElementById('doctor_name').value = admin.doctor_name;
+                    document.getElementById('doctor_degree').value = admin.doctor_degree;
+                    document.getElementById('email').value = admin.email;
+                    document.getElementById('license_number').value = admin.license_number;
+                    document.getElementById('avg_time_per_patient').value = admin.avg_time_per_patient;
+                    document.getElementById('location').value = admin.location;
+                    document.getElementById('editProfileModal').style.display = 'flex';
+                    toggleDropdown();
+                } else {
+                    alert('Failed to fetch admin details: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Error fetching admin details:', error);
+                alert('Error fetching admin details: ' + error.message);
+            }
+        }
+
+        // Update admin profile
+        async function updateProfile() {
+            const formData = {
+                hospital_name: document.getElementById('hospital_name').value,
+                doctor_name: document.getElementById('doctor_name').value,
+                doctor_degree: document.getElementById('doctor_degree').value,
+                email: document.getElementById('email').value,
+                license_number: document.getElementById('license_number').value,
+                avg_time_per_patient: document.getElementById('avg_time_per_patient').value,
+                location: document.getElementById('location').value,
+                password: document.getElementById('password').value,
+            };
+
+            try {
+                const response = await fetch('/admin/update-profile', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData),
+                });
+                const data = await response.json();
+                console.log('Update profile response:', data);
+                if (data.success) {
+                    alert('Profile updated successfully.');
+                    closeModal('editProfileModal');
+                    document.querySelector('.user-info span').textContent = 'Dr. ' + formData.doctor_name;
+                    document.querySelector('.greeting').textContent = 'Good Morning Dr. ' + formData.doctor_name;
+                } else {
+                    alert('Failed to update profile: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Error updating profile:', error);
+                alert('Error updating profile: ' + error.message);
+            }
+        }
+
+        // Handle logout
+        async function handleLogout() {
+            try {
+                const response = await fetch('/admin/logout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                });
+                const result = await response.json();
+                console.log('Logout response:', result);
+                if (result.success) {
+                    window.location.href = '/admin/login';
+                } else {
+                    alert('Logout failed. Please try again: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Error during logout:', error);
+                alert('An error occurred during logout: ' + error.message);
+            }
+        }
+
+        // Initial update of patient lists
+        updatePatientLists(selectedDate);
+    </script>
+</body>
+</html>

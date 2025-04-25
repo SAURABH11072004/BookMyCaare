@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/css/globals.css">
+  <link rel="stylesheet" href="/css/profile.css">
+  <title>Profile</title>
+</head>
+<body>
+  <div class="profile-header">
+    <a href="javascript:history.back()">
+      <img src="/images/back-arrow.jpg" alt="Back">
+    </a>
+    <h1>Patient Profile</h1>
+  </div>
+  <div class="profile-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <ul>
+        <li><a href="/appointments"><img src="/images/clock.jpg" alt="History"></a></li>
+        <li><a href="/login"><img src="/images/logout.png" alt="Logout"></a></li>
+      </ul>
+    </aside>
+
+    <!-- Main Profile Section -->
+    <div class="profile-content">
+      <h1>Welcome, <%= user.first_name %> <%= user.last_name %>!</h1>
+
+      <div class="profile-card">
+        <div class="profile-image">
+          <img src="<%= user.photo || '/images/avatar.jpg' %>" alt="User Avatar" id="profile-photo">
+        </div>
+        <label for="photo-upload" class="add-photo">Add Photo</label>
+        <input type="file" id="photo-upload" accept="image/*" style="display: none;" onchange="previewPhoto(event)">
+
+        <form id="profile-form" action="/update-profile" method="POST" enctype="multipart/form-data">
+          <input type="hidden" name="userId" value="<%= user.id %>">
+          <div class="profile-info" id="profile-info">
+            <!-- Email is non-editable and always visible -->
+            <p class="non-editable"><strong>Email:</strong> <span class="info-text"><%= user.email %></span></p>
+            <!-- Other fields remain editable -->
+            <p><strong>Gender:</strong> <span class="info-text"><%= user.gender %></span>
+              <input type="text" name="gender" value="<%= user.gender %>" class="info-input" style="visibility: hidden; position: absolute;" required>
+            </p>
+            <p><strong>Phone Number:</strong> <span class="info-text"><%= user.phone_number %></span>
+              <input type="text" name="phone_number" value="<%= user.phone_number %>" class="info-input" style="visibility: hidden; position: absolute;" required>
+            </p>
+            <p><strong>Date of Birth:</strong> <span class="info-text"><%= new Date(user.dob).toISOString().split('T')[0] %></span>
+              <input type="date" name="dob" value="<%= new Date(user.dob).toISOString().split('T')[0] %>" class="info-input" style="visibility: hidden; position: absolute;" required>
+            </p>
+            <p><strong>Location:</strong> <span class="info-text"><%= user.location %></span>
+              <input type="text" name="location" value="<%= user.location %>" class="info-input" style="visibility: hidden; position: absolute;" required>
+            </p>
+          </div>
+          <input type="hidden" name="photo" id="photo-data">
+          <button type="button" class="edit-btn" id="edit-btn" onclick="toggleEditMode()">EDIT</button>
+          <button type="submit" class="save-btn" id="save-btn" style="display: none;">SAVE</button>
+        </form>
+      </div>
+
+      <div class="profile-actions">
+        <a href="/home3.html" class="button">Back to Home</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function toggleEditMode() {
+      const editBtn = document.getElementById('edit-btn');
+      const saveBtn = document.getElementById('save-btn');
+      const infoTexts = document.querySelectorAll('.profile-info p:not(.non-editable) .info-text');
+      const infoInputs = document.querySelectorAll('.info-input');
+
+      console.log('Toggling edit mode:', { isEditMode: editBtn.textContent === 'EDIT' });
+
+      if (editBtn.textContent === 'EDIT') {
+        // Switch to edit mode
+        editBtn.style.display = 'none';
+        saveBtn.style.display = 'inline-block';
+        infoTexts.forEach(text => text.style.visibility = 'hidden');
+        infoInputs.forEach((input, index) => {
+          input.style.visibility = 'visible';
+          input.style.position = 'static';
+          console.log(`Input ${index} value:`, input.value);
+        });
+      } else {
+        // Switch back to view mode
+        editBtn.style.display = 'inline-block';
+        saveBtn.style.display = 'none';
+        infoTexts.forEach(text => text.style.visibility = 'visible');
+        infoInputs.forEach(input => {
+          input.style.visibility = 'hidden';
+          input.style.position = 'absolute';
+        });
+      }
+    }
+
+    function previewPhoto(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const img = document.getElementById('profile-photo');
+          img.src = e.target.result;
+          document.getElementById('photo-data').value = e.target.result; // Store base64 data
+          console.log('Photo preview set, base64 length:', e.target.result.length);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        console.log('No file selected for photo upload');
+      }
+    }
+
+    // Ensure photo data is set before submission
+    document.getElementById('profile-form').addEventListener('submit', function(e) {
+      const formData = new FormData(this);
+      const photoData = document.getElementById('photo-data').value;
+      const currentPhotoSrc = document.getElementById('profile-photo').src;
+
+      // If no new photo is uploaded but the current photo isn't the default, use the current photo
+      if (!photoData && currentPhotoSrc !== '<%= user.photo || "/images/avatar.jpg" %>') {
+        document.getElementById('photo-data').value = currentPhotoSrc;
+      }
+
+      console.log('Form data before submission:', {
+        gender: formData.get('gender'),
+        phone_number: formData.get('phone_number'),
+        dob: formData.get('dob'),
+        location: formData.get('location'),
+        photo: formData.get('photo') ? formData.get('photo').substring(0, 50) + '...' : 'No photo'
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,201 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  
+  .container {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+  }
+  
+  /* Header Section */
+  .header-section {
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    padding: 20px;
+    background: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+    border-radius: 10px;
+  }
+  
+  .logo-section {
+    margin-bottom: 20px;
+  }
+  
+  .logo {
+    width: 50px;
+    height: auto;
+  }
+  
+  h1 {
+    color: #1a3c34;
+    font-size: 24px;
+    margin: 0;
+  }
+  
+  .button-section {
+    margin-bottom: 20px;
+  }
+  
+  .button-section .btn {
+    background-color: #1a3c34;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+  }
+  
+  .button-section .btn:hover {
+    background-color: #154c40;
+  }
+  
+  .button-section span {
+    margin: 0 10px;
+    color: #666;
+    font-size: 14px;
+  }
+  
+  /* Form Section */
+  .form-section {
+    width: 100%;
+    max-width: 400px;
+    text-align: left;
+    padding: 20px;
+    background: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    border-radius: 10px;
+  }
+  
+  .form-section h2 {
+    color: #1a3c34;
+    font-size: 20px;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+  
+  .form-section h3 {
+    color: #666;
+    font-size: 16px;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  
+  .form-section form {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .form-section input {
+    margin-bottom: 15px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    width: 100%;
+  }
+  
+  .form-section input[type="date"] {
+    color: #666;
+  }
+  
+  .form-section .signup-btn {
+    background-color: #1a3c34;
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+  }
+  
+  .form-section .signup-btn:hover {
+    background-color: #154c40;
+  }
+  
+  /* Background Image Section */
+  .background-image {
+    width: 100%;
+    height: 300px;
+    background-image: url('/images/hospital.jpg'); /* Replace with your hospital image path */
+    background-size: cover;
+    background-position: center;
+    margin-bottom: 20px;
+  }
+  
+  /* Footer Section */
+  .footer {
+    width: 100%;
+    background-color: #1a3c34;
+    color: white;
+    padding: 20px;
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    text-align: left;
+  }
+  
+  .footer-section {
+    flex: 1;
+    min-width: 200px;
+    margin: 10px;
+  }
+  
+  .footer-logo {
+    width: 30px;
+    height: auto;
+    margin-bottom: 10px;
+  }
+  
+  .footer-section p {
+    font-size: 12px;
+    margin-bottom: 5px;
+  }
+  
+  .footer-section h4 {
+    font-size: 14px;
+    margin-bottom: 10px;
+  }
+  
+  .footer-section ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .footer-section ul li {
+    font-size: 12px;
+    margin-bottom: 5px;
+  }
+  
+  .footer-section ul li a {
+    color: white;
+    text-decoration: none;
+  }
+  
+  .footer-section ul li a:hover {
+    text-decoration: underline;
+  }
+  
+  /* Ensure Scrollability */
+  html, body {
+    height: 100%;
+    overflow-y: auto;
+  }

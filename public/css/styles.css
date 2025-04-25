@@ -1,0 +1,667 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    display: flex;
+    min-height: 100vh;
+    color: #333;
+}
+
+.sidebar {
+    width: 70px;
+    background: linear-gradient(to bottom, #00a087, #008f77);
+    padding: 20px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar img {
+    width: 35px;
+    height: 35px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.sidebar img:hover {
+    transform: scale(1.2);
+}
+
+.main-content {
+    flex: 1;
+    padding: 30px;
+    overflow-y: auto;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    background: #fff;
+    padding: 15px 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.header .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.header .logo img {
+    width: 40px;
+    height: 40px;
+}
+
+.header .logo h1 {
+    font-size: 24px;
+    color: #00a087;
+    font-weight: 600;
+}
+
+.header .user-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    position: relative;
+}
+
+.header .user-info img {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    border: 2px solid #00a087;
+    cursor: pointer;
+}
+
+.header .user-info span {
+    font-size: 16px;
+    font-weight: 500;
+    color: #333;
+}
+
+.user-info .dropdown {
+    display: none;
+    position: absolute;
+    top: 60px;
+    right: 0;
+    background: #fff;
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+}
+
+.user-info .dropdown a {
+    display: block;
+    padding: 10px 20px;
+    color: #333;
+    text-decoration: none;
+    font-size: 14px;
+    transition: background 0.3s ease;
+}
+
+.user-info .dropdown a:hover {
+    background: #e0f7fa;
+}
+
+.search-bar {
+    width: 100%;
+    max-width: 400px;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 25px;
+    font-size: 16px;
+    margin-bottom: 30px;
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05);
+    transition: border-color 0.3s ease;
+}
+
+.search-bar:focus {
+    outline: none;
+    border-color: #00a087;
+}
+
+.greeting {
+    font-size: 28px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 30px;
+    background: linear-gradient(to right, #00a087, #00c4b4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.visits-today {
+    background: #fff;
+    padding: 25px;
+    border-radius: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.visits-today::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, #e0f7fa, #b2ebf2);
+    opacity: 0.3;
+    z-index: 0;
+}
+
+.visits-today .stats {
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.visits-today .stats h2 {
+    font-size: 40px;
+    color: #00a087;
+    font-weight: 700;
+}
+
+.visits-today .stats .patient-types {
+    display: flex;
+    gap: 25px;
+}
+
+.visits-today .stats .patient-types div {
+    background: #fff;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.visits-today .stats .patient-types div:hover {
+    transform: translateY(-5px);
+}
+
+.visits-today .stats .patient-types div p:first-child {
+    font-size: 20px;
+    color: #333;
+    font-weight: 500;
+}
+
+.visits-today .stats .patient-types div p:last-child {
+    font-size: 16px;
+    color: #00a087;
+    font-weight: 600;
+}
+
+.visits-today .doctor-image {
+    width: 160px;
+    height: 160px;
+    background: url('/images/doctor.png') no-repeat center;
+    background-size: cover;
+    z-index: 1;
+}
+
+.calendar {
+    background: #fff;
+    padding: 25px;
+    border-radius: 15px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.calendar h3 {
+    font-size: 20px;
+    margin-bottom: 15px;
+    color: #333;
+    font-weight: 600;
+}
+
+.calendar table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.calendar table th, .calendar table td {
+    padding: 12px;
+    text-align: center;
+    font-size: 14px;
+}
+
+.calendar table th {
+    color: #666;
+    font-weight: 500;
+}
+
+.calendar table td {
+    color: #333;
+    transition: background-color 0.3s ease;
+    position: relative;
+    cursor: pointer;
+}
+
+.calendar table td.today {
+    background: #00a087;
+    color: #fff;
+    border-radius: 50%;
+    font-weight: 600;
+}
+
+.calendar table td.has-appointment::after {
+    content: '';
+    position: absolute;
+    bottom: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 6px;
+    height: 6px;
+    background: #ff6f61;
+    border-radius: 50%;
+}
+
+.calendar table td:hover {
+    background: #e0f7fa;
+}
+
+.patient-list {
+    display: flex;
+    gap: 30px;
+}
+
+.patient-list .section {
+    flex: 1;
+    background: #fff;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.patient-list .section h3 {
+    font-size: 20px;
+    margin-bottom: 15px;
+    color: #333;
+    font-weight: 600;
+}
+
+.patient-list .section .patient {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    transition: background-color 0.3s ease;
+    cursor: pointer;
+}
+
+.patient-list .section .patient:hover {
+    background: #f9f9f9;
+}
+
+.patient-list .section .patient .info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.patient-list .section .patient .info .avatar {
+    width: 45px;
+    height: 45px;
+    background: linear-gradient(45deg, #e0f7fa, #b2ebf2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: #333;
+    font-weight: 600;
+}
+
+.patient-list .section .patient .info .details p:first-child {
+    font-size: 18px;
+    color: #333;
+    font-weight: 500;
+}
+
+.patient-list .section .patient .info .details p:last-child {
+    font-size: 14px;
+    color: #666;
+}
+
+.patient-list .section .patient .time {
+    font-size: 16px;
+    color: #00a087;
+    font-weight: 500;
+}
+
+.no-data {
+    text-align: center;
+    color: #666;
+    font-size: 16px;
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 10px;
+}
+
+.error-message {
+    text-align: center;
+    color: #d32f2f;
+    font-size: 16px;
+    padding: 15px;
+    background: #ffebee;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 800px;
+    max-height: 80vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.modal-content h3 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #00a087;
+}
+
+.modal-content .close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+}
+
+.modal-content .patient-details {
+    margin-bottom: 20px;
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.modal-content .patient-details p {
+    font-size: 16px;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+/* Prescription Modal Styles */
+.prescription-header {
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.prescription-header p {
+    margin: 5px 0;
+}
+
+.medicine-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+    align-items: center;
+}
+
+.medicine-row input {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.medicine-row button {
+    background: #ff6b6b;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+.add-medicine-btn {
+    background: #00a087;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    cursor: pointer;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.save-btn {
+    background: #00a087;
+    color: white;
+}
+
+.cancel-btn, .close-btn {
+    background: #6c757d;
+    color: white;
+}
+
+.prescription-content {
+    white-space: pre-line;
+    padding: 10px;
+    background: #f9f9f9;
+    border-radius: 4px;
+    margin-top: 15px;
+}
+
+.patient-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.prescription-btn {
+    background: #00a087;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.view-prescription-btn {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+/* Profile Edit Form Styles */
+.modal-content form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.modal-content form label {
+    font-size: 16px;
+    color: #333;
+    font-weight: 500;
+}
+
+.modal-content form input,
+.modal-content form select {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.modal-content form button {
+    background: #00a087;
+    color: #fff;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.3s ease;
+}
+
+.modal-content form button:hover {
+    background: #008f77;
+}
+
+.complete-btn {
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+.patient-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.prescription-form {
+    margin-top: 20px;
+}
+
+.medicine-item {
+    background: #f8f9fa;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-left: 4px solid #00a087;
+}
+
+.medicine-search-container {
+    position: relative;
+    margin-bottom: 15px;
+}
+
+.select2-container {
+    width: 100% !important;
+}
+
+.medicine-details {
+    display: none;
+    background: #f1f1f1;
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 5px;
+}
+
+.prescription-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.view-prescription {
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.view-prescription .medicine-item {
+    background: #fff;
+    border: 1px solid #ddd;
+    margin-bottom: 15px;
+}
+/* Search Results Modal */
+#searchResultsModal .modal-content {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+#searchResultsList .patient {
+    cursor: pointer;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+#searchResultsList .patient:hover {
+    background-color: #f0f0f0;
+}
+
+#searchResultsList .info {
+    display: flex;
+    align-items: center;
+}
+
+#searchResultsList .avatar {
+    width: 40px;
+    height: 40px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+    font-size: 16px;
+}
+
+.patient-details button {
+    background-color: #00a1a7;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .patient-details button:hover {
+    background-color: #007a7e;
+  }
+
+#searchResultsList .details p {
+    margin: 0;
+    font-size: 14px;
+}

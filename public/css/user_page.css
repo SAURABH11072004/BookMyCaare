@@ -1,0 +1,247 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}
+
+body {
+    background-color: #f5f7fa;
+}
+
+.container {
+    display: flex;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 80px;
+    background-color: #1a3c34;
+    color: white;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 20px;
+}
+
+.logo {
+    font-size: 18px;
+    margin-bottom: 40px;
+}
+
+.menu-item {
+    font-size: 24px;
+    margin: 20px 0;
+    cursor: pointer;
+}
+
+.menu-item.active {
+    background-color: #2a5f55;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+/* Main Content */
+.main-content {
+    flex: 1;
+    padding: 20px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.header h1 {
+    font-size: 28px;
+    color: #1a3c34;
+}
+
+.search-bar input {
+    padding: 10px;
+    border-radius: 20px;
+    border: 1px solid #ddd;
+    width: 300px;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.user-profile img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.user-profile span {
+    font-size: 16px;
+}
+
+.notification {
+    cursor: pointer;
+}
+
+/* Greeting Section */
+.greeting-section {
+    position: relative;
+    background-color: #e6f0fa;
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.greeting-section h2 {
+    font-size: 24px;
+    color: #1a3c34;
+    margin-bottom: 20px;
+}
+
+.stats {
+    display: flex;
+    gap: 20px;
+}
+
+.stat-card {
+    background-color: white;
+    border-radius: 10px;
+    padding: 15px;
+    width: 150px;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.stat-card h3 {
+    font-size: 16px;
+    color: #666;
+}
+
+.stat-card .number {
+    font-size: 28px;
+    font-weight: bold;
+    color: #1a3c34;
+    margin: 10px 0;
+}
+
+.stat-card .percentage {
+    font-size: 14px;
+}
+
+.stat-card .percentage.up {
+    color: green;
+}
+
+.stat-card .percentage.down {
+    color: red;
+}
+
+.doctor-illustration {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    width: 200px;
+}
+
+/* Calendar Section */
+.calendar-section {
+    background-color: white;
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 20px;
+    width: 350px;
+    float: right;
+}
+
+.calendar-section h3 {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+    text-align: center;
+}
+
+.day-header {
+    font-size: 12px;
+    color: #666;
+}
+
+.day {
+    padding: 10px;
+    font-size: 14px;
+}
+
+.day.empty {
+    background-color: transparent;
+}
+
+.day.marked {
+    background-color: #ff6f61;
+    color: white;
+    border-radius: 50%;
+}
+
+/* Patient Lists */
+.patient-lists {
+    display: flex;
+    gap: 20px;
+}
+
+.patient-list {
+    flex: 1;
+    background-color: white;
+    border-radius: 20px;
+    padding: 20px;
+}
+
+.patient-list h3 {
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+.patient-list h3 span {
+    font-size: 14px;
+    color: #666;
+}
+
+.patient {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.patient-initials {
+    width: 40px;
+    height: 40px;
+    background-color: #ffe6e6;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: #ff6f61;
+}
+
+.patient-info p {
+    font-size: 14px;
+}
+
+.patient-info p span {
+    color: #666;
+    font-size: 12px;
+}

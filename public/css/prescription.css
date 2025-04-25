@@ -1,0 +1,33 @@
+.prescription-container {
+    width: 80%;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: white;
+    box-shadow: 0px 0px 10px #ccc;
+    text-align: center;
+  }
+  
+  .prescription-container h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+  
+  .prescription-details p {
+    font-size: 18px;
+    margin: 10px 0;
+  }
+  
+  .button {
+    margin-top: 20px;
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #3498db;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+  }
+  
+  .button:hover {
+    background-color: #2980b9;
+  }
+  

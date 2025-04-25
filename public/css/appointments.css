@@ -1,0 +1,74 @@
+.appointments-container {
+  width: 80%;
+  margin: 50px auto;
+  padding: 20px;
+  background-color: white;
+  box-shadow: 0px 0px 10px #ccc;
+  text-align: center;
+}
+
+.appointments-container h1 {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.view-prescription-button {
+  background-color: #00a1a7;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  text-decoration: none;
+  margin-top: 10px;
+  display: inline-block;
+}
+
+.view-prescription-button:hover {
+  background-color: #007a7e;
+}
+
+.appointments-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.appointment-item {
+  background-color: #f9f9f9;
+  margin-bottom: 10px;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+}
+
+.appointment-details p {
+  margin: 5px 0;
+}
+
+.view-prescription-button {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 10px 20px;
+  background-color: #3498db;
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+}
+
+.view-prescription-button:hover {
+  background-color: #2980b9;
+}
+
+.button {
+  margin-top: 20px;
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #3498db;
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+}
+
+.button:hover {
+  background-color: #2980b9;
+}

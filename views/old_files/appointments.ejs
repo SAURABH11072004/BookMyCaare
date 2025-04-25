@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/css/globals.css">
+  <link rel="stylesheet" href="/css/appointments.css">
+  <title>Appointments</title>
+</head>
+<body>
+  <div class="appointments-container">
+    <h1>Your Appointments</h1>
+    
+    <% if (appointments && appointments.length > 0) { %>
+      <ul class="appointments-list">
+        <% appointments.forEach(appointment => { %>
+          <li class="appointment-item">
+            <div class="appointment-details">
+              <p><strong>Name:</strong> <%= appointment.first_name %> <%= appointment.last_name %></p>
+              <p><strong>Doctor:</strong> <%= appointment.doctor_name %></p>
+              <p><strong>Date:</strong> <%= appointment.appointment_date %></p>
+              <p><strong>Time:</strong> <%= appointment.appointment_time %></p>
+              <p><strong>Status:</strong> <%= appointment.status %></p>
+            </div>
+            <a href="/prescription/<%= appointment.id %>" class="view-prescription-button">View Prescription</a>
+          </li>
+        <% }) %>
+      </ul>
+    <% } else { %>
+      <p>You have no appointments yet.</p>
+    <% } %>
+    
+    <a href="/create-appointment" class="button">Create New Appointment</a>
+    <a href="/profile" class="button">Back to Profile</a>
+  </div>
+</body>
+</html>
